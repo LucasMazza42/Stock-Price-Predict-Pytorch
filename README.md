@@ -15,6 +15,7 @@
 
 <img width="723" alt="Screenshot 2023-07-10 at 8 36 46 PM" src="https://github.com/LucasMazza42/Stock-Price-Predict-Pytorch/assets/47802441/e22dd360-6081-4ecd-ae6a-8d9c6170db06">
 
-# RMSE and diagnostics
+# Diagnostics
 
-<img width="319" alt="Screenshot 2023-07-10 at 8 39 16 PM" src="https://github.com/LucasMazza42/Stock-Price-Predict-Pytorch/assets/47802441/8136f45d-217a-4e28-b350-b8c58590796b">
+<img width="318" alt="Screenshot 2023-07-10 at 9 55 21 PM" src="https://github.com/LucasMazza42/Stock-Price-Predict-Pytorch/assets/47802441/f8477d5d-2ba0-4276-8c29-fdf049f7d1ef">
+
