@@ -193,7 +193,7 @@ def train(data: tuple, max_epochs: int = 200, seed=12345) -> tuple:
     print('---------- Training has started: -------------')
    
     optimizer = torch.optim.Adam(net.parameters())
-
+    #test
     for epoch in iterator: 
       
        
@@ -269,12 +269,6 @@ def plot_predictions(model: nn.Module, stock_dict: dict) -> None:
     
     plt.savefig(os.path.join(os.path.dirname(__file__), 'predictions.png'))
     print('Predictions plotted.')
-
-"""
--------------------------------------------------------------------------------------------
-THE CODE BELOW IS FOR EVALUATION. 
--------------------------------------------------------------------------------------------
-"""
 
 
 if __name__ == '__main__':
