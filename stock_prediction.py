@@ -1,6 +1,7 @@
 import os
 from math import pi
 
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -132,7 +133,7 @@ def get_train_valid(stock_dict: dict) -> tuple:
         y_train.append(values[1])
         x_val.append(values[2])
         y_val.append(values[3])
-    
+       
     x_train = np.concatenate(x_train)
     y_train = np.concatenate(y_train)
     x_val = np.concatenate(x_val)
@@ -171,7 +172,7 @@ def train(data: tuple, max_epochs: int = 200, seed=12345) -> tuple:
     net = MyNetwork(5, 100, 2)
 
     x_train, y_train, x_val, y_val = data
-
+    print(x_train)
     x_train = torch.from_numpy(x_train)
     y_train = torch.from_numpy(y_train)
     x_val = torch.from_numpy(x_val)
@@ -253,9 +254,20 @@ def plot_predictions(model: nn.Module, stock_dict: dict) -> None:
    
         pred = model(torch.Tensor(x_val).to(device)).detach().cpu().numpy()
         
+
         pred_prices, pred_risks = pred[:, 0], np.sqrt(np.exp(pred[:, 1]))
+        #RMSE 
         rmse = np.sqrt(np.mean((pred_prices - y_val) ** 2))
         print(f'RMSE for {stock} is: {rmse}')
+
+        #R2
+        mean_y_true = np.mean(y_val)
+    
+        ssr = np.sum(np.square(y_val - pred_prices))
+        sst = np.sum(np.square(y_val - mean_y_true))
+        
+        r2 = 1 - (ssr / sst)
+        print(f'R2 for {stock} is: {r2}')
 
         i, j = k // 2, k % 2
 
