@@ -86,6 +86,7 @@ def plot_data(stock_dict: dict) -> None:
 def split_stock(stock_info: pd.DataFrame) -> tuple:
 
 
+    #we use the first 5 days to then predict the 6th day closing price
     
     x = []
     y = []
