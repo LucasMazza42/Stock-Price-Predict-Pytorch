@@ -289,7 +289,7 @@ if __name__ == '__main__':
     os.system('cls' if os.name == 'nt' else 'clear')
 
     file_path = os.path.join(os.path.dirname(
-        __file__), '/Users/lucasmazza/Desktop/Stock_PIrce/Stock-Price-Predict-Pytorch/stock_train.csv')
+        __file__), '/Users/lucasmazza/Desktop/Stock_Price/Stock-Price-Predict-Pytorch/stock_train.csv')
     stock_dict = pre_process(file_path)
    
     plot_data(stock_dict)
