@@ -5,9 +5,7 @@ class MyNetwork(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super(MyNetwork, self).__init__()
        
-    
-      
-        self.fc1 = nn.Linear(torch.tensor(input_dim), hidden_dim)
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
         self.fc2 = nn.ReLU()
         self.fc3 = nn.Linear(hidden_dim, output_dim)
         self.output_dim = output_dim
@@ -24,6 +22,4 @@ class MyNetwork(nn.Module):
       
         out = self.fc3(out)
 
-
         return out
-    

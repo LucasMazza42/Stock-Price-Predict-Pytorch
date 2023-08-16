@@ -34,16 +34,12 @@ def get_device() -> torch.device:
             'cpu' if no GPU is available
     """
 
-    if torch.cuda.is_available():
-        return torch.device('cuda')
-    elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-        return torch.device('mps')
-    else:
-        return torch.device('cpu')
+    device = torch.device('mps')
+    
+
 
 
 device = get_device()
-
 
 def pre_process(file_path: str) -> dict:
    
@@ -144,20 +140,9 @@ def get_train_valid(stock_dict: dict) -> tuple:
     return (x_train, y_train, x_val, y_val)
 def my_NLLloss(pred: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
    
-    predictedPrice = pred[:, 0]
-    risk = pred[:, 1]
-    dist = y[:]
-    distance = (dist - predictedPrice)**2
-    partOne = torch.log(torch.tensor(np.sqrt(2 * pi)))
-    divide = (2*torch.exp(risk))
-    eachTor = (1/2) * risk
- 
-    #source: https://pytorch.org/docs/stable/generated/torch.sum.html
-    #sum all input tensors 
-    nll_loss = torch.sum((partOne) + eachTor + (distance / divide)) 
-                            
-    
-    return nll_loss
+    mse_loss = nn.MSELoss()
+    loss = mse_loss(pred[:, 0], y)  # Only consider the predicted prices for MSE
+    return loss
 
 
 def train(data: tuple, max_epochs: int = 200, seed=12345) -> tuple:
@@ -173,7 +158,7 @@ def train(data: tuple, max_epochs: int = 200, seed=12345) -> tuple:
     net = MyNetwork(5, 100, 2)
 
     x_train, y_train, x_val, y_val = data
-    print(x_train)
+    
     x_train = torch.from_numpy(x_train)
     y_train = torch.from_numpy(y_train)
     x_val = torch.from_numpy(x_val)
