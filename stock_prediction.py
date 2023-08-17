@@ -1,7 +1,6 @@
 import os
 from math import pi
-
-
+import keras.backend as K
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -9,7 +8,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from model import MyNetwork
-
+import tensorflow as tf 
+from MyCustomLoss import MyCustomLoss
 
 try:
     from tqdm import tqdm
@@ -146,13 +146,11 @@ def my_NLLloss(pred: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 
 
 def train(data: tuple, max_epochs: int = 200, seed=12345) -> tuple:
-   
     torch.manual_seed(seed)
 
     if tqdm is not None:
         iterator = tqdm(range(max_epochs))
     else:
-
         iterator = range(max_epochs)
         
     net = MyNetwork(5, 100, 2)
@@ -169,9 +167,9 @@ def train(data: tuple, max_epochs: int = 200, seed=12345) -> tuple:
     x_val = x_val.to(torch.float32)
     y_val = y_val.to(torch.float32)
 
-    y_train.to(device)
-    x_val.to(device)
-    y_val.to(device)
+    y_train = y_train.to(device)
+    x_val = x_val.to(device)
+    y_val = y_val.to(device)
     net.to(device)
 
     train_losses = []
@@ -180,37 +178,31 @@ def train(data: tuple, max_epochs: int = 200, seed=12345) -> tuple:
     print('---------- Training has started: -------------')
    
     optimizer = torch.optim.Adam(net.parameters())
-    #test
-    for epoch in iterator: 
-      
-       
-        optimizer.zero_grad()
-        #professor example train_model
-        #compute loss
-        #backwardstep 
-            #do for validation and training
-        
-        train_loss = my_NLLloss(net(x_train), y_train)
-     
-        val_loss = my_NLLloss(net(x_val), y_val) 
-        train_loss.backward()
-        val_loss.backward()
     
+    criterion = MyCustomLoss()  # Use the custom loss function
+
+    for epoch in iterator: 
+        optimizer.zero_grad()
+
+        train_outputs = net(x_train)
+        train_loss = criterion(train_outputs, y_train)
+        train_loss.backward()
         optimizer.step()
 
+        with torch.no_grad():
+            val_outputs = net(x_val)
+            val_loss = criterion(val_outputs, y_val)
         
         train_losses.append(train_loss.item())
         val_losses.append(val_loss.item())
+
         if tqdm is not None:
             iterator.set_description(f' Epoch: {epoch+1}')
             iterator.set_postfix(train_loss=round(train_loss.item(), 1),
                                  val_loss=round(val_loss.item(), 1))
-
-                                 
         else:
-            print(
-                f'epoch {epoch+1}: train_loss = {train_loss}, val_loss = {val_loss}')
-    
+            print(f'epoch {epoch+1}: train_loss = {train_loss}, val_loss = {val_loss}')
+
     print('---------- Training ended. -------------\n')
     
     plt.figure()
@@ -225,6 +217,7 @@ def train(data: tuple, max_epochs: int = 200, seed=12345) -> tuple:
     plt.close()
 
     return net, train_losses[-1], val_losses[-1]
+
 
 
 def plot_predictions(model: nn.Module, stock_dict: dict) -> None:
@@ -269,6 +262,7 @@ def plot_predictions(model: nn.Module, stock_dict: dict) -> None:
     print('Predictions plotted.')
 
 
+
 if __name__ == '__main__':
 
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -283,3 +277,4 @@ if __name__ == '__main__':
     
     net, train_loss, val_loss = train(data, max_epochs=1000)
     print(plot_predictions(net, stock_dict))
+
