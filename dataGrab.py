@@ -25,10 +25,12 @@ def get_stock_prices(symbol, api_key, start_date, end_date, file_path):
         df['date'] = df['date'].str.split('T').str[0]
         df.columns = [col.capitalize() for col in df.columns]
         df['Stock'] = symbol
-        df.to_csv(file_path, mode='w', header=False, index=False)
+        print(df)
+        df.to_csv(file_path, mode='w', header=True, index=False)
 
-        print("Data Appended " + symbol + " to CSV File Successfully.")
-        print("\n" + "Please Continue")
+        print("Data Appended " + symbol + " to CSV File Successfully.", flush=True)
+        #print("\n" + "Please Continue")
+        return 
         
     else:
         print("Error:", response.status_code)

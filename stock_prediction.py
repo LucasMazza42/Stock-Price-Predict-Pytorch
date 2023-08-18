@@ -1,6 +1,8 @@
 import os
 from math import pi
 import keras.backend as K
+import matplotlib
+matplotlib.use('Agg')  # Use the "Agg" backend
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -44,6 +46,7 @@ device = get_device()
 def pre_process(file_path: str) -> dict:
    
     df = pd.read_csv(file_path)
+    
     stocks = sorted(list(set(df['Stock']))) # stocks in alphabetical order
    
     stock_dict = dict()
@@ -62,21 +65,16 @@ def pre_process(file_path: str) -> dict:
     
     return stock_dict
 def plot_data(stock_dict: dict) -> None:
-   
+    stock_symbol = next(iter(stock_dict.keys()))
 
-    stocks = list(stock_dict.keys())
+    plt.figure(figsize=(8, 6))
+    plt.plot(stock_dict[stock_symbol]['Close'].values)
+    plt.title(f'{stock_symbol} Close Price')
+    plt.xlabel('Days')
+    plt.ylabel('Close Price')
+    plt.savefig(os.path.join(os.path.dirname(__file__), f'{stock_symbol}_history.png'))
+    plt.show()
 
-    fig, axs = plt.subplots(2, 2)
-    fig.tight_layout(pad=3.0)
-    for i in range(2):
-        for j in range(2):
-            axs[i, j].plot(stock_dict[stocks[i*2+j]]['Close'].values)
-            axs[i, j].set_title(f'{stocks[i*2+j]}')
-
-    for ax in axs.flat:
-        ax.set(xlabel='days', ylabel='close price')
-
-    plt.savefig(os.path.join(os.path.dirname(__file__), 'stocks_history.png'))
 
 
 def split_stock(stock_info: pd.DataFrame) -> tuple:
@@ -138,6 +136,8 @@ def get_train_valid(stock_dict: dict) -> tuple:
     
   
     return (x_train, y_train, x_val, y_val)
+
+
 def my_NLLloss(pred: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
    
     mse_loss = nn.MSELoss()
@@ -179,19 +179,19 @@ def train(data: tuple, max_epochs: int = 200, seed=12345) -> tuple:
    
     optimizer = torch.optim.Adam(net.parameters())
     
-    criterion = MyCustomLoss()  # Use the custom loss function
+    #criterion = MyCustomLoss()  # Use the custom loss function
 
     for epoch in iterator: 
         optimizer.zero_grad()
 
         train_outputs = net(x_train)
-        train_loss = criterion(train_outputs, y_train)
+        train_loss = my_NLLloss(train_outputs, y_train)
         train_loss.backward()
         optimizer.step()
 
         with torch.no_grad():
             val_outputs = net(x_val)
-            val_loss = criterion(val_outputs, y_val)
+            val_loss = my_NLLloss(val_outputs, y_val)
         
         train_losses.append(train_loss.item())
         val_losses.append(val_loss.item())
@@ -271,10 +271,10 @@ if __name__ == '__main__':
         __file__), '/Users/lucasmazza/Desktop/Stock_Price/Stock-Price-Predict-Pytorch/stock_train.csv')
     stock_dict = pre_process(file_path)
    
-    plot_data(stock_dict)
+    #plot_data(stock_dict)
 
-    data = get_train_valid(stock_dict)
+    #data = get_train_valid(stock_dict)
     
-    net, train_loss, val_loss = train(data, max_epochs=1000)
-    print(plot_predictions(net, stock_dict))
+    #net, train_loss, val_loss = train(data, max_epochs=1000)
+    #print(plot_predictions(net, stock_dict))
 

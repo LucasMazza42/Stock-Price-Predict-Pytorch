@@ -1,10 +1,13 @@
 import dataGrab
 import stock_prediction
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 import pandas as pd
 from datetime import datetime
+import matplotlib
+matplotlib.use('Agg')  # Use the "Agg" backend
+import matplotlib.pyplot as plt
+import os
 
-# Initialize the Flask app
 app = Flask(__name__)
 
 # Your API key and file path
@@ -14,24 +17,33 @@ file_path = '/Users/lucasmazza/Desktop/Stock_Price/Stock-Price-Predict-Pytorch/U
 # Start and end dates
 start_date = "1994-01-01"
 end_date = datetime.today().strftime('%Y-%m-%d')  # Current date
+app = Flask(__name__, static_folder='static')
+plot_image_filename = "static/prediction.png"
+@app.route('/plot/predictions.png')
+def serve_plot_image():
+    return send_from_directory('static',plot_image_filename)
 
-# Route to handle user input and display predictions
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    predicted_price = None
     if request.method == 'POST':
         symbol = request.form.get('symbol')
-        predicted_price = stock_prediction.predict_stock_price(symbol)  # Implement this function or logic
-        
+
         df = dataGrab.get_stock_prices(symbol, api_key, start_date, end_date, file_path)
         stock_dict = stock_prediction.pre_process(file_path)
         data = stock_prediction.get_train_valid(stock_dict)
         net, train_loss, val_loss = stock_prediction.train(data, max_epochs=1000)
-        plot_path = stock_prediction.plot_predictions(net, stock_dict)
         
-        return render_template('index.html', predicted_price=predicted_price, symbol=symbol, plot_path=plot_path)
+        # Generate and save the plot image
+        stock_prediction.plot_predictions(net, stock_dict)
+        
+        # Rename the generated plot image to match the expected format in the template
+        plot_image_filename = "predictions.png"
+        plot_path = os.path.join('static', plot_image_filename)
+        os.rename('predictions.png', plot_path)
+
+        return render_template('index.html', plot_image_filename=plot_image_filename)
     
-    return render_template('index.html', predicted_price=predicted_price)
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
