@@ -9,8 +9,8 @@ Current functionality:
 2) Create model to predict next days price
 3) Create model to predict if the price will be up or down
 
-#Price prediction model 
+# Price prediction model 
 
-#Up or Down 
+# Up or Down 
 
-#Web app
+# Web app
